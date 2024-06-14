@@ -1,0 +1,126 @@
+create table user (
+id number(18,0) Not null, 
+jmeno varchar2(50 char) Not null,
+prijmeni varchar2(50 char) Not null,
+uzitelske_jmeno varchar2(50 char) Not null,
+heslo varchar2(20 char) Not null,
+email varchar2(50 char) Not null,
+vek number(2,0) Not null,
+aktivni number(1,0) Not null,
+pohlavi varchar2(1 char) Not null,
+vlastni_plan number(1,0) Not null default 0,
+mesto varchar2(100 char) Not null);
+
+create unique index user_pk on user(id);
+alter table user add constraint user_pk primary key (id);
+alter table user add constraint user_aktivni_c check (aktivni in(0,1));
+alter table user add constraint user_pohlavi_c check (pohlavi in('F','M','N'));
+alter table user add constraint user_vlastni_plan_c check (vlastni_plan in(0,1));
+
+
+
+create table role (
+id number(18,0) Not null, 
+nazev_role varchar2(50 char) Not null);
+
+create unique index role_pk on role(id);
+alter table role add constraint role_pk primary key (id); 
+insert into role(id, nazev_role) values(hibernate_sequence.nextVal, 'admin'),(hibernate_sequence.nextVal, 'trener'),(hibernate_sequence.nextVal, 'klient');
+
+
+
+crate table user_role( 
+user_id number(18,0) Not null,
+role_id number(18,0) Not null);
+
+alter table user_role add constraint user_role_user_fk foreign key (user_id) references user(id) on delete cascade;
+alter table user_role add constraint user_role_role_fk foreign key (role_id) references role(id) on delete cascade;
+
+create unique index user_role_pk on user_role(user_id, role_id);
+
+
+
+create table predplatne( 
+id number(18,0) Not null,
+nazev varchar2(50 char) Not null,
+cena number(18,2) Not null);
+
+create unique index predplatne_pk on role(id);
+alter table role add constraint predplatne_pk primary key (id);
+
+
+
+create table user_predplatne(
+user_id number(18,0) Not null,
+predplatne_id number(18,0) Not null);
+
+alter table user_role add constraint user_predplatne_user_fk foreign key (user_id) references user(id) on delete cascade;
+alter table user_role add constraint user_predplatne_predplatne_fk foreign key (predplatne_id) references predplatne(id) on delete cascade;
+create unique index user_pradplatne_pk on user_predplatne(user_id, predplatne_id);
+
+
+
+create table cvicebni_plan(
+id number(18,0) Not null,
+user_id number(18,0) Not null,
+trener number(18,0) Not null,
+od date Not null,
+do date Not null,
+nazev varchar2(100 char) Not null,
+typ varchar2(50 char) Not null,
+
+create unique index cvicebni_plan_pk on user(id);
+alter table cvicebni_plan add constraint cvicebni_plan_user_pk primary key (id);
+alter table cvicebni_plan add constraint cvicebni_plan_user_cvicebni_plan_fk foreign key (cvicebni_plan_id) references cvicebni_plan(id) on delete cascade;
+alter table cvicebni_plan add constraint user_cvicebni_plan_user_fk foreign key (user_id) references user(id) on delete cascade;
+
+
+
+create table cviky(
+id number(18,0) Not null,
+nazev varchar2(100 char) Not null,
+cast_tela varchar2(50 char) Not null,
+popis varchar2(2000 char) Not null,
+cesta_k_videu varchar2(100 char) Not null);
+
+alter table cvicebni_plan add constraint cviky_pk primary key (id);
+alter table cvicebni_plan add constraint cviky_fk foreign key (cviky_id) references cviky(id) on delete cascade;
+
+
+
+create table cvicebni_plan_cviky(
+id number(18,0) Not null,
+cvicebni_plan_id number(18,0) Not null,
+cviky_id number(18,0) Not null,
+serie number(2,0) Not null,
+opakování nubmber(2,0) Not null);
+
+create unique index cvicebni_plan_cviky_pk on cviky(id);
+alter table cvicebni_plan_cviky add constraint cvicebni_plan_cviky_pk primary key (id);
+alter table cvicebni_plan_cviky add constraint cvicebni_plan_cviky_cvicebni_plan_fk foreign key (cvicebni_plan_id) references cvicebni_plan(id) on delete cascade;
+alter table cvicebni_plan_cviky add constraint cvicebni_plan_cviky_cviky_fk foreign key (cviky_id) references cviky(id) on delete cascade;
+
+
+
+create table postava_uzivatele( 
+id number(18,0) Not null,
+user_id number(18,0) Not null,
+vyska number(3,0) Not null,
+vaha number(3,0) Not null,
+lytka number(3,0) Not null,
+stehna number(3,0) Not null,
+boky number(3,0) Not null,
+pas number(3,0) Not null,
+poprsi number(3,0) Not null,
+biceps number(3,0) Not null);
+
+
+create unique index postava_uzivatele_pk on user(id);
+alter table postava_uzivatele add constraint postava_uzivatele_user_pk primary key (id);
+alter table postava_uzivatele add constraint cvicebni_plan_user_cvicebni_plan_fk foreign key (cvicebni_plan_id) references cvicebni_plan(id) on delete cascade;
+alter table postava_uzivatele add constraint user_cvicebni_plan_user_fk foreign key (user_id) references user(id) on delete cascade;
+
+
+
+
+
